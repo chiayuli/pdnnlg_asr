@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# exp/tri4 : the SAT model
+%WER 23.6 | 1831 21395 | 79.0 15.2 5.9 2.6 23.6 61.6 | exp/tri4/decode_eval2000_sw1_tg/score_16_0.0/eval2000.ctm.swbd.filt.sys
+%WER 31.1 | 4459 42989 | 72.6 20.4 7.0 3.8 31.1 68.4 | exp/tri4/decode_eval2000_sw1_tg/score_13_1.0/eval2000.ctm.filt.sys
+
+# results of pdnnlg systems
+
+# run-dnn.sh
+
+# run-dnn-fbank.sh
+
+# run-cnn.sh
+
+# run-cnn-lacea.sh

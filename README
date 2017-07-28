@@ -1,0 +1,21 @@
+### Tools Must be installed ###
+install_pfile_utils.sh
+
+### swbd ###
+swbd folder includes the recipes of training DNN/CNN/CNN_LACEA based Acoustic Models with SWBD Data Set for ASR system.
+In contains
+	run_swbd_pdnnlg/  
+	pdnnlg/ 
+	steps_pdnnlg/ 
+
+Please copy all three folders under Kaldi-trunck/egs/swbd/s5c/ , and follow these steps:
+	1) Download/Install Kaldi
+	2) Use $KALDI_ROOT/egs/swbd/s5c/run.sh recipe to get HMM-GMM SAT model (tri4) 
+	3) Use run_swbd_pdnnlg/run-dnn.sh recipe to train HMM-DNN model, and get transcription and WER result
+	       run_swbd_pdnnlg/run-dnn-fbank.sh recipe to train HMM-DNN model with fbank, and get transcription and WER result
+	       run_swbd_pdnnlg/run-cnn.sh recipe to train HMM-CNN model, and get transcription and WER result
+	       run_swbd_pdnnlg/run-cnn-lacea.sh recipe to train HMM-CNN-LACEA model, and get transcription and WER result
+	       
+### wsj ###
+wsj folder includes the recipes of training DNN/CNN/CNN_LACEA based Acoustic Models with WSJ Data Set for ASR system
+
