@@ -3,14 +3,14 @@
 # Copyright 2017     Chia-Yu Li  University of Stuttgart       Apache 2.0
 # This script trains CNN model over the filterbank features. It  is to be run
 # after run.sh. Before running this, you should already build the initial GMM
-# GMM model. This script requires a GPU, and also the "pdnn" toolkit to train
+# GMM model. This script requires a GPU, and also the "pdnnlg" toolkit to train
 # CNN. The input filterbank features are with mean and variance normalization. 
 
 # The input features and CNN architecture follow the IBM configuration: 
 # Hagen Soltau, George Saon, and Tara N. Sainath. Joint Training of Convolu-
 # tional and non-Convolutional Neural Networks
 
-working_dir=exp_pdnn_300h/cnn
+working_dir=exp_pdnnlg_300h/cnn
 gmmdir=exp/tri4b 
 
 # Specify the gpu device to be used
@@ -91,13 +91,13 @@ echo =====================================================================
 # By default, CNN_LACEA inputs include 61 frames of filterbanks.
 every_nth_frame=4
 if [ ! -f $working_dir/train.pfile.done ]; then
-  steps_pdnn/build_nnet_pfile.sh   --do-concat false \
+  steps_pdnnlg/build_nnet_pfile.sh   --do-concat false \
     --norm-vars true --add-deltas false --splice-opts "--left-context=30 --right-context=30" \
     $working_dir/data/train ${gmmdir}_ali_nodup $working_dir $every_nth_frame || exit 1
   touch $working_dir/train.pfile.done
 fi
 if [ ! -f $working_dir/valid.pfile.done ]; then
-  steps_pdnn/build_nnet_pfile.sh   --do-concat false \
+  steps_pdnnlg/build_nnet_pfile.sh   --do-concat false \
     --norm-vars true --add-deltas false --splice-opts "--left-context=30 --right-context=30" \
     $working_dir/data/valid ${gmmdir}_ali_dev $working_dir $every_nth_frame || exit 1
   touch $working_dir/valid.pfile.done
@@ -128,7 +128,7 @@ echo =====================================================================
 mkdir -p $working_dir/data_conv
 for set in eval2000; do
   if [ ! -d $working_dir/data_conv/$set ]; then
-    steps_pdnn/make_conv_feat.sh --nj 24   \
+    steps_pdnnlg/make_conv_feat.sh --nj 24   \
       $working_dir/data_conv/$set $working_dir/data/$set $working_dir $working_dir/nnet.param \
       $working_dir/nnet.cfg $working_dir/_log $working_dir/_conv || exit 1;
     # Generate *fake* CMVN states here.
@@ -146,12 +146,18 @@ echo =====================================================================
 if [ ! -f  $working_dir/decode.done ]; then
   cp $gmmdir/final.mdl $working_dir || exit 1;  # copy final.mdl for scoring
   graph_dir=$gmmdir/graph_sw1_tg
-  #graph_dir=$gmmdir/graph_sw1_fsh_fg
-  steps_pdnn/decode_dnn.sh --nj 24 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
+  steps_pdnnlg/decode_cnn_lacea.sh --nj 24 --scoring-opts "--min-lmwt 7 --max-lmwt 30"   \
     --norm-vars false --add-deltas false --splice-opts "--left-context=0 --right-context=0" \
     $graph_dir $working_dir/data_conv/eval2000 ${gmmdir}_ali_nodup $working_dir/decode_eval2000_sw1_tg || exit 1;
 
   touch $working_dir/decode.done
+fi
+
+# add_fisher LM to rescore
+if [ ! -f  $working_dir/decode.lmrescore.done ]; then
+  steps/lmrescore_const_arpa.sh data/lang_sw1_{tg,fsh_fg} $working_dir/data_conv/eval2000 $working_dir/decode_eval2000_sw1_{tg,
+    fsh_fg}
+  touch $working_dir/decode.lmrescore.done
 fi
 
 echo "Finish !!"

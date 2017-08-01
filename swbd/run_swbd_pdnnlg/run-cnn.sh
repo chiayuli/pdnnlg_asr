@@ -3,7 +3,7 @@
 # Copyright 2017     Chia-Yu Li  University of Stuttgart       Apache 2.0
 # This script trains CNN model over the filterbank features. It  is to be run
 # after run.sh. Before running this, you should already build the initial GMM
-# GMM model. This script requires a GPU, and also the "pdnn" toolkit to train
+# GMM model. This script requires a GPU, and also the "pdnnlg" toolkit to train
 # CNN. The input filterbank features are with mean and variance normalization. 
 
 # The input features and CNN architecture follow the IBM configuration: 
@@ -116,7 +116,7 @@ if [ ! -f $working_dir/cnn.fine.done ]; then
     $pythonCMD pdnnlg/cmds/run_CNN.py --train-data "$working_dir/train.pfile.*.gz,partition=2000m,random=true,stream=true" \
                           --valid-data "$working_dir/valid.pfile.*.gz,partition=600m,random=true,stream=true" \
                           --conv-nnet-spec "3x11x40:256,9x9,p1x3:256,3x4,p1x1,f" \
-                          --nnet-spec "2048:2048:2048:2048:$num_pdfs" \
+                          --nnet-spec "2048:2048:2048:2048:2048:$num_pdfs" \
                           --lrate "D:0.08:0.5:0.2,0.2:4" --momentum 0.9 \
                           --wdir $working_dir --param-output-file $working_dir/nnet.param \
                           --cfg-output-file $working_dir/nnet.cfg --kaldi-output-file $working_dir/dnn.nnet || exit 1;
@@ -129,7 +129,7 @@ echo =====================================================================
 mkdir -p $working_dir/data_conv
 for set in eval2000; do
   if [ ! -d $working_dir/data_conv/$set ]; then
-    steps_pdnn/make_conv_feat.sh --nj 24   \
+    steps_pdnnlg/make_conv_feat.sh --nj 24   \
       $working_dir/data_conv/$set $working_dir/data/$set $working_dir $working_dir/nnet.param \
       $working_dir/nnet.cfg $working_dir/_log $working_dir/_conv || exit 1;
     # Generate *fake* CMVN states here.
@@ -147,12 +147,17 @@ echo =====================================================================
 if [ ! -f  $working_dir/decode.done ]; then
   cp $gmmdir/final.mdl $working_dir || exit 1;  # copy final.mdl for scoring
   graph_dir=$gmmdir/graph_sw1_tg
-  #graph_dir=$gmmdir/graph_sw1_fsh_fg
-  steps_pdnn/decode_dnn.sh --nj 24 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
+  steps_pdnnlg/decode_dnn.sh --nj 24 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
     --norm-vars false --add-deltas false --splice-opts "--left-context=0 --right-context=0" \
     $graph_dir $working_dir/data_conv/eval2000 ${gmmdir}_ali_nodup $working_dir/decode_eval2000_sw1_tg || exit 1;
 
   touch $working_dir/decode.done
+fi
+
+# add_fisher LM to rescore
+if [ ! -f  $working_dir/decode.lmrescore.done ]; then
+  steps/lmrescore_const_arpa.sh data/lang_sw1_{tg,fsh_fg} $working_dir/data_conv/eval2000 $working_dir/decode_eval2000_sw1_{tg,fsh_fg}
+  touch $working_dir/decode.lmrescore.done
 fi
 
 echo "Finish !!"

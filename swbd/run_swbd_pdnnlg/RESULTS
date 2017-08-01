@@ -1,15 +1,32 @@
 #!/bin/bash
 
-# exp/tri4 : the SAT model
-%WER 23.6 | 1831 21395 | 79.0 15.2 5.9 2.6 23.6 61.6 | exp/tri4/decode_eval2000_sw1_tg/score_16_0.0/eval2000.ctm.swbd.filt.sys
+# exp/tri4b : the SAT model
 %WER 31.1 | 4459 42989 | 72.6 20.4 7.0 3.8 31.1 68.4 | exp/tri4/decode_eval2000_sw1_tg/score_13_1.0/eval2000.ctm.filt.sys
+%WER 23.6 | 1831 21395 | 79.0 15.2 5.9 2.6 23.6 61.6 | exp/tri4/decode_eval2000_sw1_tg/score_16_0.0/eval2000.ctm.swbd.filt.sys
+### add_fisher LM ###
+%WER 20.2 | 1831 21395 | 82.1 12.8 5.1 2.3 20.2 58.3 | exp/tri4/decode_eval2000_sw1_fsh_fg/score_15_0.0/eval2000.ctm.swbd.filt.sys
+%WER 27.6 | 4459 42989 | 75.6 17.6 6.7 3.3 27.6 64.8 | exp/tri4/decode_eval2000_sw1_fsh_fg/score_14_1.0/eval2000.ctm.filt.sys
 
-# results of pdnnlg systems
+# results of pdnn systems
 
 # run-dnn.sh
+%WER 17.2 | 1831 21395 | 84.6 10.8 4.7 1.8 17.2 56.7 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fmllr/decode_eval2000_sw1_tg/score_10_0.5/eval2000.ctm.swbd.filt.sys
+%WER 23.1 | 4459 42989 | 79.3 14.5 6.2 2.5 23.1 62.0 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fmllr/decode_eval2000_sw1_tg/score_11_0.5/eval2000.ctm.filt.sys
+### add_fisher LM ###
+%WER 13.9 | 1831 21395 | 87.6 8.4 4.1 1.5 13.9 50.4 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fmllr/decode_eval2000_sw1_fsh_fg/score_12_0.0/eval2000.ctm.swbd.filt.sys
+%WER 19.7 | 4459 42989 | 82.5 12.1 5.4 2.3 19.7 57.3 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fmllr/decode_eval2000_sw1_fsh_fg/score_11_0.0/eval2000.ctm.filt.sys
 
 # run-dnn-fbank.sh
+%WER 18.5 | 1831 21395 | 83.6 11.9 4.5 2.1 18.5 57.4 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fbank/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.swbd.filt.sys
+%WER 24.7 | 4459 42989 | 78.1 15.7 6.2 2.8 24.7 63.1 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fbank/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.filt.sys
+### add_fisher LM ###
+%WER 14.7 | 1831 21395 | 87.2 9.2 3.6 1.9 14.7 51.7 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fbank/decode_eval2000_sw1_fsh_fg/score_10_0.0/eval2000.ctm.swbd.filt.sys
+%WER 20.8 | 4459 42989 | 81.7 13.0 5.4 2.5 20.8 58.1 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/dnn_fbank/decode_eval2000_sw1_fsh_fg/score_10_1.0/eval2000.ctm.filt.sys
+
 
 # run-cnn.sh
+%WER 17.5 | 1831 21395 | 84.2 11.1 4.6 1.8 17.5 56.0 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.swbd.filt.sys
+%WER 23.6 | 4459 42989 | 78.9 14.9 6.2 2.5 23.6 61.7 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.filt.sys
+### add_fisher LM ###
 
 # run-cnn-lacea.sh

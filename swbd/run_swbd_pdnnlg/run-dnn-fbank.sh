@@ -103,17 +103,18 @@ echo =====================================================================
 echo "                  DNN Pre-training & Fine-tuning                   "
 echo =====================================================================
 feat_dim=$(gunzip -c $working_dir/train.pfile.1.gz |head |grep num_features| awk '{print $2}') || exit 1;
+export PYTHONPATH=$PYTHONPATH:`pwd`/pdnnlg/;
+export PATH=$PATH:$PYTHONPATH
 
 if [ ! -f $working_dir/dnn.fine.done ]; then
   echo "Fine-tuning DNN"
   export CUDA_VISIBLE_DEVICES="0";
-  export PYTHONPATH=$PYTHONPATH:`pwd`/pdnnlg/ \; \
-  export THEANO_FLAGS=mode=FAST_RUN,device=$gpu,floatX=float32 \; \
-  $pythonCMD pdnnlg/cmds/run_DNN.py --train-data "$working_dir/train.pfile.*.gz,partition=2000m,random=true,stream=true" \
+  THEANO_FLAGS=mode=FAST_RUN,device=$gpu,floatX=float32 nohup $pythonCMD pdnnlg/cmds/run_DNN.py \ 
+				    --train-data "$working_dir/train.pfile.*.gz,partition=2000m,random=true,stream=true" \
                                     --valid-data "$working_dir/valid.pfile.*.gz,partition=600m,random=true,stream=true" \
-                                    --nnet-spec "$feat_dim:2048:2048:2048:2048:2048:2048:2048:2048:2048:$num_pdfs" \
+                                    --nnet-spec "$feat_dim:2048:2048:2048:2048:2048:2048:2048:$num_pdfs" \
                                     --lrate "D:0.08:0.5:0.2,0.2:8" \
-                                    --wdir $working_dir --kaldi-output-file $working_dir/dnn.nnet || exit 1;
+                                    --wdir $working_dir --kaldi-output-file $working_dir/dnn.nnet >> run.dnn.log.all.dnn_fbank&
   touch $working_dir/dnn.fine.done
 fi
 
@@ -123,10 +124,16 @@ echo =====================================================================
 if [ ! -f  $working_dir/decode.done ]; then
   cp $gmmdir/final.mdl $working_dir || exit 1;  # copy final.mdl for scoring
   graph_dir=$gmmdir/graph_sw1_tg
-  #graph_dir=$gmmdir/graph_sw1_fsh_fg
   steps_pdnnlg/decode_dnn.sh --nj 24 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
      $graph_dir $working_dir/data/eval2000 ${gmmdir}_ali_nodup $working_dir/decode_eval2000_sw1_tg || exit 1;
   touch $working_dir/decode.done
+fi
+
+# add_fisher LM to rescore
+if [ ! -f  $working_dir/decode.lmrescore.done ]; then
+  steps/lmrescore_const_arpa.sh data/lang_sw1_{tg,fsh_fg} $working_dir/data/eval2000 $working_dir/decode_eval2000_sw1_{tg,
+    fsh_fg}
+  touch $working_dir/decode.lmrescore.done
 fi
 
 echo "Finish !!"

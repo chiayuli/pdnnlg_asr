@@ -55,7 +55,7 @@ dir=`echo $4 | sed 's:/$::g'` # remove any trailing slash.
 
 srcdir=`dirname $dir`; # assume model directory one level up from decoding directory.
 sdata=$data/split$nj;
-echo $sdata
+echo "working_dir: $srcdir"
 thread_string=
 [ $num_threads -gt 1 ] && thread_string="-parallel --num-threads=$num_threads"
 
