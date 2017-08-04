@@ -28,5 +28,7 @@
 %WER 17.5 | 1831 21395 | 84.2 11.1 4.6 1.8 17.5 56.0 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.swbd.filt.sys
 %WER 23.6 | 4459 42989 | 78.9 14.9 6.2 2.5 23.6 61.7 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_tg/score_10_0.0/eval2000.ctm.filt.sys
 ### add_fisher LM ###
+%WER 14.3 | 1831 21395 | 87.3 8.7 4.0 1.5 14.3 50.7 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_fsh_fg/score_11_0.0/eval2000.ctm.swbd.filt.sys
+%WER 20.1 | 4459 42989 | 82.0 12.3 5.7 2.1 20.1 57.1 | /mount/arbeitsdaten/asr/licu/swbd/exp_pdnn_300h/cnn/decode_eval2000_sw1_fsh_fg/score_11_0.0/eval2000.ctm.filt.sys
 
 # run-cnn-lacea.sh

@@ -128,7 +128,7 @@ echo =====================================================================
 mkdir -p $working_dir/data_conv
 for set in eval2000; do
   if [ ! -d $working_dir/data_conv/$set ]; then
-    steps_pdnnlg/make_conv_feat.sh --nj 24   \
+    steps_pdnnlg/make_conv_feat_lacea.sh --nj 24   \
       $working_dir/data_conv/$set $working_dir/data/$set $working_dir $working_dir/nnet.param \
       $working_dir/nnet.cfg $working_dir/_log $working_dir/_conv || exit 1;
     # Generate *fake* CMVN states here.
