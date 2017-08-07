@@ -10,7 +10,7 @@
 # Hagen Soltau, George Saon, and Tara N. Sainath. Joint Training of Convolu-
 # tional and non-Convolutional Neural Networks
 
-working_dir=exp_pdnnlg_300h/cnn
+working_dir=exp_pdnnlg_300h/cnn_lacea
 gmmdir=exp/tri4b 
 
 # Specify the gpu device to be used
