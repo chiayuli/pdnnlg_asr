@@ -108,7 +108,7 @@ if [ ! -f $working_dir/cnn_lacea.fine.done ]; then
                           --valid-data "$working_dir/train_cv05.pfile.*.gz,partition=600m,random=true,stream=true" \
                           --conv-nnet-spec "1x61x40:256,9x9,p1x3:256,3x4,p1x1,f" \
                           --nnet-spec "$num_pdfs" \
-                          --lrate "D:0.0001:0.5:0.2,0.2:8" --momentum 0.9 \
+                          --lrate "D:0.00005:0.5:0.2,0.2:8" --momentum 0.9 \
                           --wdir $working_dir --param-output-file $working_dir/nnet.param \
                           --cfg-output-file $working_dir/nnet.cfg --kaldi-output-file $working_dir/dnn.nnet || exit 1;
   touch $working_dir/cnn_lacea.fine.done
