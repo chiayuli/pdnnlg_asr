@@ -33,6 +33,8 @@ If u meet this Theano Error 'libcudnn.so.6.0: cannot open shared object file: No
 
 because it looks like you have an old module that is still compiled with cudnn from cuda 6.0.
 
+If u meet this pygpu Error 'ValueError: Your installed version of pygpu(0.6.9) is too old, please upgrade to 0.7.0 or later (but below 0.8.0)'. Then, upgrade pygpu by running the below commands:
+	conda install -c conda-forge pygpu
 
 ## Add path into ~/.bashrcXXXX where XXXX is server name, and run it everytime u log on to the server ##
 
