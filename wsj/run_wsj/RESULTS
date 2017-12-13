@@ -21,3 +21,21 @@
 # run-cnn-lacea.sh
 %WER 7.75 [ 638 / 8234, 98 ins, 100 del, 440 sub ] /speech/dbwork/mul/spielwiese/deyulic/wsj/exp_pdnn/cnn1/decode_nosp_bd_tgpr_dev93_all.v10_36_4JB_testlr.ep8.test1/wer_30_0.0
 %WER 4.36 [ 246 / 5643, 39 ins, 16 del, 191 sub ] /speech/dbwork/mul/spielwiese/deyulic/wsj/exp_pdnn/cnn1/decode_nosp_bd_tgpr_eval92_all.v10_36_4JB_testlr.ep8.test1/wer_31_0.0
+
+# run-densenet.sh
+# The DenseNet model was trained on 78 hours WSJ
+%WER 8.80 (Re-run, TBA)
+%WER 4.78 (Re-run, TBA)
+
+## DenseNet with smaller training data experiments
+# The DenseNet model was trained on 2 hours WSJ data
+%WER 13.85 [ 1140 / 8234, 194 ins, 212 del, 734 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/cnn_2hr/decode_nosp_bd_tgpr_dev93_densenet_L40.2hr/wer_12_0.5
+%WER 7.53  [ 425 / 5643, 47 ins, 46 del, 332 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/cnn_2hr/decode_nosp_bd_tgpr_eval92_densenet_L40.2hr/wer_11_0.5
+
+# The DenseNet model was trained on 5 hours WSJ data
+%WER 11.22 [ 924 / 8234, 173 ins, 141 del, 610 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/densenet_3_11_40/decode_nosp_bd_tgpr_dev93_densenet_L40_1_3.ep16/wer_11_0.0
+%WER 6.11 [ 345 / 5643, 38 ins, 42 del, 265 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/densenet_3_11_40/decode_nosp_bd_tgpr_eval92_densenet_L40_1_3.ep16/wer_10_1.0
+
+# The DenseNet model was trained on 22 hours WSJ data
+%WER 8.60 [ 708 / 8234, 67 ins, 137 del, 504 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/cnn_24hrs/decode_nosp_bd_tgpr_dev93_densenet_L40_again2/wer_9_0.5
+%WER 4.66 [ 263 / 5643, 23 ins, 29 del, 211 sub ] /mount/arbeitsdaten/asr/licu/wsj/exp_pdnn/cnn_24hrs/decode_nosp_bd_tgpr_eval92_densenet_L40_again2/wer_10_0.0

@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Copyright 2017    Chia-Yu Li  University of Stuttgart       Apache 2.0
-# This script trains CNN-LACEA model over the filterbank features. It  is to be run
+# This script trains DenseNet model over the filterbank features. It  is to be run
 # after run.sh. Before running this, you should already build the initial GMM
-# GMM model. This script requires a GPU, and also the "pdnnlg" toolkit to train
-# CNN-LACEA. The input filterbank features are with mean and variance normalization. 
+# GMM model. This script requires a GPU, and also the "pdnn" toolkit to train
+# DenseNet. The input filterbank features are with mean and variance normalization. 
 
-# The input features and CNN-LACEA architecture follow the IBM configuration: 
+# The input features and DenseNet architecture follow the IBM configuration: 
 # Hagen Soltau, George Saon, and Tara N. Sainath. Joint Training of Convolu-
 # tional and non-Convolutional Neural Networks
 
-working_dir=exp_pdnnlg/cnn_lacea
+working_dir=exp_pdnn/densenet
 gmmdir=exp/tri4b
 
 # Specify the gpu device to be used
@@ -84,36 +84,38 @@ done
 echo =====================================================================
 echo "               Training and Cross-Validation Pfiles                "
 echo =====================================================================
-# By default, CNN-LACEA inputs include 61 frames of filterbanks
+# By default, DenseNet inputs include 11 frames of filterbanks, and with delta
+# and double-deltas.
 # This parameter is for the frame-skipping mechanism in order to speed up the training. e.g. 1 is no frame skipping and 2 is 2 frames skipping 
-every_nth_frame=2
+every_nth_frame=1
 for set in tr95 cv05; do
   if [ ! -f $working_dir/${set}.pfile.done ]; then
-    steps_pdnnlg/build_nnet_pfile.sh   --norm-vars true --add-deltas false --do-concat false \
-      --splice-opts "--left-context=30 --right-context=30" \
+    steps_pdnnlg/build_nnet_pfile.sh   --norm-vars true --add-deltas true --do-concat false \
+      --splice-opts "--left-context=5 --right-context=5" \
       $working_dir/data/train_$set ${gmmdir}_ali_$set $working_dir $every_nth_frame || exit 1
     touch $working_dir/${set}.pfile.done
   fi
 done
 
 echo =====================================================================
-echo "                        CNN-LACEA  Fine-tuning                           "
+echo "                        DenseNet  Fine-tuning                           "
 echo =====================================================================
-# CNN-LACEA is configed in the way that it has (approximately) the same number of trainable parameters as DNN
-# (e.g., the DNN in run-dnn-fbank.sh). 
-if [ ! -f $working_dir/cnn_lacea.fine.done ]; then
-    echo "Fine-tuning CNN"
+# DenseNet is configed in the way that it has (approximately) the same number of trainable parameters as DNN
+# (e.g., the DNN in run-dnn-fbank.sh). Also, we adopt "--momentum 0.9" becuase DenseNet over filterbanks seems
+# to converge slowly. So we increase momentum to speed up convergence.
+if [ ! -f $working_dir/densenet.fine.done ]; then
+    echo "Fine-tuning DNN"
     export CUDA_VISIBLE_DEVICES="0";
     export PYTHONPATH=$PYTHONPATH:`pwd`/pdnnlg/ ;
     export THEANO_FLAGS=mode=FAST_RUN,device=$gpu,floatX=float32 \; \
-  $pythonCMD pdnnlg/cmds/run_CNN_LACEA.py --train-data "$working_dir/train_tr95.pfile.*.gz,partition=2000m,random=true,stream=true" \
+  $pythonCMD pdnnlg/cmds/run_DENSENET.py --train-data "$working_dir/train_tr95.pfile.*.gz,partition=1000m,random=true,stream=true" \
                           --valid-data "$working_dir/train_cv05.pfile.*.gz,partition=600m,random=true,stream=true" \
-                          --conv-nnet-spec "1x61x40:256,9x9,p1x3:256,3x4,p1x1,f" \
+                          --conv-nnet-spec "3x11x40:256,9x9,p1x3:256,3x4,p1x1,f" \
                           --nnet-spec "$num_pdfs" \
-                          --lrate "D:0.00005:0.5:0.2,0.2:8" --momentum 0.9 \
+                          --lrate "D:0.005:0.5:0.2,0.2:4" --momentum 0.9 \
                           --wdir $working_dir --param-output-file $working_dir/nnet.param \
                           --cfg-output-file $working_dir/nnet.cfg --kaldi-output-file $working_dir/dnn.nnet || exit 1;
-  touch $working_dir/cnn_lacea.fine.done
+  touch $working_dir/densenet.fine.done
 fi
 
 echo =====================================================================
@@ -122,7 +124,7 @@ echo =====================================================================
 mkdir -p $working_dir/data_conv
 for set in dev93; do
   if [ ! -d $working_dir/data_conv/$set ]; then
-    steps_pdnnlg/make_conv_feat_lacea.sh --nj 10   \
+    steps_pdnnlg/make_conv_feat_densenet.sh --nj 10   \
       $working_dir/data_conv/$set $working_dir/data/$set $working_dir $working_dir/nnet.param \
       $working_dir/nnet.cfg $working_dir/_log $working_dir/_conv || exit 1;
     # Generate *fake* CMVN states here.
@@ -132,7 +134,7 @@ for set in dev93; do
 done
 for set in eval92; do
   if [ ! -d $working_dir/data_conv/$set ]; then
-    steps_pdnnlg/make_conv_feat_lacea.sh --nj 8   \
+    steps_pdnnlg/make_conv_feat_densenet.sh --nj 8   \
       $working_dir/data_conv/$set $working_dir/data/$set $working_dir $working_dir/nnet.param \
       $working_dir/nnet.cfg $working_dir/_log $working_dir/_conv || exit 1;
     # Generate *fake* CMVN states here.
@@ -150,10 +152,10 @@ echo =====================================================================
 if [ ! -f  $working_dir/decode.done ]; then
   cp $gmmdir/final.mdl $working_dir || exit 1;  # copy final.mdl for scoring
   graph_dir=$gmmdir/graph_nosp_bd_tgpr
-  steps_pdnnlg/decode_cnn_lacea.sh --nj 10 --scoring-opts "--min-lmwt 7 --max-lmwt 30"   \
+  steps_pdnnlg/decode_densenet.sh --nj 10 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
     --norm-vars false --add-deltas false --splice-opts "--left-context=0 --right-context=0" \
     $graph_dir $working_dir/data_conv/dev93 ${gmmdir}_ali_tr95 $working_dir/decode_nosp_bd_tgpr_dev93 || exit 1;
-  steps_pdnnlg/decode_cnn_lacea.sh --nj 8 --scoring-opts "--min-lmwt 7 --max-lmwt 30"   \
+  steps_pdnnlg/decode_densenet.sh --nj 8 --scoring-opts "--min-lmwt 7 --max-lmwt 18"   \
     --norm-vars false --add-deltas false --splice-opts "--left-context=0 --right-context=0" \
     $graph_dir $working_dir/data_conv/eval92 ${gmmdir}_ali_tr95 $working_dir/decode_nosp_bd_tgpr_eval92 || exit 1;
   touch $working_dir/decode.done
