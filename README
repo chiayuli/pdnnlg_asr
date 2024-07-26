@@ -1,12 +1,31 @@
-### Tools Must be installed ###
+The code was originally written by [@kaldipdnn](https://github.com/yajiemiao/kaldipdnn) and modified by [@Chia-Yu Li](https://github.com/chiayuli).
+
+# Citations
+```
+@INPROCEEDINGS{8578047,
+  author={Li, Chia Yu and Vu, Ngoc Thang},
+  booktitle={Speech Communication; 13th ITG-Symposium}, 
+  title={Densely Connected Convolutional Networks for Speech Recognition}, 
+  year={2018},
+  volume={},
+  number={},
+  pages={1-5},
+  keywords={},
+  doi={}}
+```
+
+# Datasets
+* SWBD (LDC97S62)
+* WSJ (LDC97S62 and LDC94S13A)
+
+# Toolkits
 install_pfile_utils.sh
 
-### 300 hours Switchboard Task ###
-swbd folder includes the recipes of training DNN/CNN/CNN-LACE based Acoustic Models with SWBD Data Set for ASR system.
-In contains
-	run_swbd_pdnnlg/  
-	pdnnlg/ 
-	steps_pdnnlg/ 
+# run scripts
+* For SWBD task, the recipes of training DNN/CNN/CNN-LACE based acoustic models are in the following folders
+- run_swbd_pdnnlg
+- pdnnlg 
+- steps_pdnnlg 
 
 Please copy all three folders under Kaldi-trunck/egs/swbd/s5c/ , and follow these steps:
 	1) Download/Install Kaldi
